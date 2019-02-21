@@ -26,9 +26,9 @@ CREATE TABLE Apartment(
 
 CREATE TABLE Offer(
     nIdOffer                          SERIAL                                        ,
-    nIdApartment                        INT                                           ,
-    start_date                          DATE                     NOT NULL             ,
-    end_date                            DATE                                          ,
+    nIdApartment                        INT                                         ,
+    start_date                          DATE                     NOT NULL           ,
+    end_date                            DATE                                        ,
     CONSTRAINT pk_offer                 PRIMARY KEY (nIdOffer)                      ,
     CONSTRAINT unq_offer_apartment      UNIQUE (nIdApartment, start_date, end_date)
 );

@@ -42,7 +42,7 @@ def is_connected():
 
 
 def connect():
-    """Function in charge of connecting to the database "market_data".
+    """Function in charge of connecting to the database "sssb_data".
 
     Raises:
         DatabaseException: If something impedes to connect to the database.
@@ -52,7 +52,7 @@ def connect():
     global conn, log
 
     try:
-        conn = psycopg2.connect("dbname=sssb_data user=sssbuser host=localhost password=sssb123")
+        conn = psycopg2.connect("dbname=postgres user=postgres host=localhost password=postgres")
     except Exception as e:
         log.exception("Failed to connect")
         raise DatabaseException("Failed to connect\n" + str(e))
