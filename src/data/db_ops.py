@@ -23,8 +23,9 @@ db_user = os.getenv("DB_USER")
 db_host = os.getenv("DB_HOST")
 db_pass = os.getenv("DB_PASS")
 
-hdlr = logging.FileHandler(os.path.join('C:\\Users\\andre\\Documents\\Workdir\\SSSB-scraper\\Logs',
-                                        'SSSBData.log'),
+dirname = os.path.dirname(__file__)
+hdlr = logging.FileHandler(os.path.join(dirname,
+                                        '..\\..\\Logs\\SSSBData.log'),
                            encoding="UTF-8")
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
