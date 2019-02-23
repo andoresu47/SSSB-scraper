@@ -40,7 +40,7 @@ CREATE TABLE State(
     no_applicants                       INT                   NOT NULL                ,
     top_credits                         INT                   NOT NULL                ,
     CONSTRAINT pk_state                 PRIMARY KEY (nIdState)                        ,
-    CONSTRAINT fk_state_nIdApartment    FOREIGN KEY (nIdApartment)      REFERENCES Apartment(nIdApartment)     ,
+    CONSTRAINT fk_state_nIdApartment    FOREIGN KEY (nIdApartment)      REFERENCES Apartment(nIdApartment)         ,
     CONSTRAINT fk_state_nIdOffer        FOREIGN KEY (nIdOffer)      REFERENCES Offer(nIdOffer)                     ,
     CONSTRAINT unq_state                UNIQUE      (nIdApartment, time_stamp)
 );
