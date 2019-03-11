@@ -1,9 +1,7 @@
 from selenium import webdriver
-import time
 from dotenv import load_dotenv
 import os
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.expected_conditions import _find_element
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
@@ -42,7 +40,7 @@ try:
     password.send_keys(sssb_pass)
     login_attempt = browser.find_element_by_xpath("""//*[@id="header-loginform"]/button""")
     login_attempt.click()
-    
+
     print "Clicked login link"
 
     end_dates_and_times = []
