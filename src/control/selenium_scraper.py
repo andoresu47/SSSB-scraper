@@ -18,19 +18,23 @@ sssb_pass = os.getenv("SSSB_PASS")
 
 dirname = os.path.dirname(__file__)
 
-browser = webdriver.Chrome(executable_path=os.path.join(dirname, '..\\..\\Dependencies\\Selenium\\chromedriver.exe'))
+options = webdriver.FirefoxOptions()
+options.add_argument('-headless')
+
+browser = webdriver.Firefox(executable_path=os.path.join(dirname, '../../Dependencies/Selenium/geckodriver'))
 browser.set_page_load_timeout(30)
 browser.get("https://www.sssb.se/en")
 
 # Logging in
 try:
     # Wait until the corresponding apartment link is loaded
-    my_pages = WebDriverWait(browser, 10).until(
+    my_pages = WebDriverWait(browser, 15).until(
         EC.presence_of_element_located(
             (By.XPATH,
              """//*[@id="mina-sidor-trigger"]"""
              )))
     my_pages.click()
+    print "Clicked mypages link"
 
     username = browser.find_element_by_id("user_login")
     password = browser.find_element_by_id("user_pass")
@@ -38,8 +42,10 @@ try:
     password.send_keys(sssb_pass)
     login_attempt = browser.find_element_by_xpath("""//*[@id="header-loginform"]/button""")
     login_attempt.click()
+    
+    print "Clicked login link"
 
-    # end_dates_and_times = []
+    end_dates_and_times = []
 
     # Apartments from current offering
     browser.get("https://www.sssb.se/en/find-apartment/apply-for-apartment/available-apartments/?paginationantal=all")
@@ -56,7 +62,7 @@ try:
         for i in range(1, no_apts + 1):
             try:
                 # Wait until the corresponding apartment link is loaded
-                current_apt = WebDriverWait(browser, 3).until(
+                current_apt = WebDriverWait(browser, 10).until(
                     EC.presence_of_element_located(
                         (By.XPATH,
                          '//*[@id="SubNavigationContentContainer"]/div[4]/div[{0}]/div/div/div[2]/div/div[1]/h4/a'.format(
@@ -66,7 +72,7 @@ try:
 
                 # Wait until the apartment info is loaded
                 try:
-                    apt_name = WebDriverWait(browser, 3).until(
+                    apt_name = WebDriverWait(browser, 10).until(
                         EC.presence_of_element_located(
                             (By.XPATH,
                              '//*[@id="SubNavigationContentContainer"]/div/div/div[1]/div[2]/h1'
@@ -77,7 +83,7 @@ try:
                        """//*[@id="SubNavigationContentContainer"]/div/div/div[1]/div[6]/div""").text
                     split_text = offering.split()
                     end_date_and_time = [split_text[3], split_text[5]]
-                    # end_dates_and_times.append(end_date_and_time)
+                    end_dates_and_times.append(end_date_and_time)
 
                     print apt_name, end_date_and_time
 
