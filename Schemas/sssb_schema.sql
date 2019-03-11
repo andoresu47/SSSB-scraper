@@ -48,6 +48,7 @@ CREATE TABLE State(
 CREATE TABLE IsOffered(
     nIdApartment                        INT                                         ,
     nIdOffer                            INT                                         ,
+    win_credits                         INT                                         ,
     CONSTRAINT fk_offer_nIdApartment    FOREIGN KEY (nIdApartment)      REFERENCES Apartment(nIdApartment)     ,
     CONSTRAINT fk_offer_nIdOffer        FOREIGN KEY (nIdOffer)          REFERENCES Offer(nIdOffer)             ,
     CONSTRAINT unq_offer_apartment      UNIQUE      (nIdApartment, nIdOffer)
