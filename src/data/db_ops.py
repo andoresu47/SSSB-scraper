@@ -95,3 +95,53 @@ def disconnect():
     except Exception as e:
         log.exception("Unable to disconnect from database")
         raise DatabaseException("Unable to disconnect from database\n" + str(e))
+
+
+def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', electricity='False', _10_month='False'):
+    """Function for inserting a new valid row into the "apartment" table.
+        In case of success the corresponding id is returned.
+
+    Args:
+        apt_name: string representing the address of an apartment.
+        apt_type:
+        apt_zone:
+        apt_price:
+        furnitured:
+        electricity:
+        _10_month:
+
+    Raises:
+        Exception: In case no insertion was possible.
+
+    Returns:
+        int: integer representing the inserted row ID.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('Apartment: Inserting new apartment: {0}'.format(apt_name))
+        cur.execute("""INSERT INTO apartment (name, type, zone, price, furnitured, electricity, _10_month)
+                            VALUES ('{apt_name}', '{apt_type}', '{apt_zone}', {apt_price}, {furnitured}, {electricity}, {_10_month})
+                            RETURNING nIdapartment"""
+                    .format(apt_name=apt_name,
+                            apt_type=apt_type,
+                            apt_zone=apt_zone,
+                            apt_price=apt_price,
+                            furnitured=furnitured,
+                            electricity=electricity,
+                            _10_month=_10_month
+                            ))
+        ticker_id = int(cur.fetchone()[0])
+        log.info('Apartment: Committing transaction')
+        conn.commit()
+        cur.close()
+        return ticker_id
+    except Exception as e:
+        conn.rollback()
+        log.error('Apartment: Rolling back transaction')
+        log.exception("Apartment: Couldn't insert successfully")
+        raise
+
