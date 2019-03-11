@@ -6,7 +6,7 @@
 /*                        anlm@kth.se                                     */
 /* Script type:           Database creation script                        */
 /* Created on:            2018-02-18 15:34                                */
-/* Updated on:            2018-02-21 18:34                                */
+/* Updated on:            2018-03-11 11:00                                */
 /* ---------------------------------------------------------------------- */
 
 SET timezone = 'Europe/Stockholm';
