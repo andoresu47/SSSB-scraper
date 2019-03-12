@@ -23,7 +23,7 @@ def get_timestamp():
 
     """
 
-    return time.strftime('%Y-%m-%d %H:%M:%S').decode('utf-8')
+    return time.strftime('%Y-%m-%d %H:%M:%S')
 
 
 class SSSBApartmentInfoSpider(scrapy.Spider):
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     s = get_project_settings()
     process = CrawlerProcess(s)
 
-    # spider = SSSBApartmentInfoSpider()
-    spider = SSSBApartmentStateSpider()
+    spider = SSSBApartmentInfoSpider()
+    # spider = SSSBApartmentStateSpider()
     process.crawl(spider)
     process.start()  # the script will block here until the crawling is finished

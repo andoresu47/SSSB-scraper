@@ -32,7 +32,7 @@ try:
              """//*[@id="mina-sidor-trigger"]"""
              )))
     my_pages.click()
-    print "Clicked mypages link"
+    print("Clicked mypages link")
 
     username = browser.find_element_by_id("user_login")
     password = browser.find_element_by_id("user_pass")
@@ -41,7 +41,7 @@ try:
     login_attempt = browser.find_element_by_xpath("""//*[@id="header-loginform"]/button""")
     login_attempt.click()
 
-    print "Clicked login link"
+    print("Clicked login link")
 
     end_dates_and_times = []
 
@@ -83,10 +83,10 @@ try:
                     end_date_and_time = [split_text[3], split_text[5]]
                     end_dates_and_times.append(end_date_and_time)
 
-                    print apt_name, end_date_and_time
+                    print(apt_name, end_date_and_time)
 
                 except TimeoutException:
-                    print "Loading apartment took too much time!"
+                    print("Loading apartment took too much time!")
 
                 finally:
                     # Always go back to the apartment selection web page
@@ -94,12 +94,12 @@ try:
                         "https://www.sssb.se/en/find-apartment/apply-for-apartment/available-apartments/?paginationantal=all")
 
             except TimeoutException:
-                print "Loading appartment link took too much time!"
+                print("Loading appartment link took too much time!")
                 # If there is a timeout exception, just reload
                 browser.refresh()
 
 except Exception as e:
-    print "Something went wrong when logging in..."
+    print("Something went wrong when logging in...")
 
 finally:
     # browser.implicitly_wait(10)

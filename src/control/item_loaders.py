@@ -70,7 +70,7 @@ class SSSBApartmentLoader(ItemLoader):
     """
 
     # Checks if parsed data is empty, in which case, the item is set to None
-    default_input_processor = MapCompose(unicode.strip, is_empty)
+    default_input_processor = MapCompose(str.strip, is_empty)
 
     # Parsing of price
     apt_price_in = MapCompose(get_first_space)
@@ -97,7 +97,7 @@ class SSSBApartmentStateLoader(ItemLoader):
     """
 
     # Checks if parsed data is empty, in which case, the item is set to None
-    default_input_processor = MapCompose(unicode.strip, is_empty)
+    default_input_processor = MapCompose(str.strip, is_empty)
 
     apt_no_applicants_in = MapCompose(get_second_space, get_number)
     apt_no_applicants_out = TakeFirst()

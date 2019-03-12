@@ -74,6 +74,8 @@ def connect():
                                                                                    db_user,
                                                                                    db_host,
                                                                                    db_pass))
+        conn.set_client_encoding("utf-8")
+
     except Exception as e:
         log.exception("Failed to connect")
         raise DatabaseException("Failed to connect\n" + str(e))
@@ -123,17 +125,10 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
     cur = conn.cursor()
     try:
         log.info('Apartment: Inserting new apartment: {0}'.format(apt_name))
-        cur.execute("""INSERT INTO apartment (name, type, zone, price, furnitured, electricity, _10_month)
-                            VALUES ('{apt_name}', '{apt_type}', '{apt_zone}', {apt_price}, {furnitured}, {electricity}, {_10_month})
-                            RETURNING nIdapartment"""
-                    .format(apt_name=apt_name,
-                            apt_type=apt_type,
-                            apt_zone=apt_zone,
-                            apt_price=apt_price,
-                            furnitured=furnitured,
-                            electricity=electricity,
-                            _10_month=_10_month
-                            ))
+        sql = """INSERT INTO apartment (name, type, zone, price, furnitured, electricity, _10_month) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s) 
+                    RETURNING nIdapartment"""
+        cur.execute(sql, (apt_name, apt_type, apt_zone, apt_price, furnitured, electricity, _10_month))
         ticker_id = int(cur.fetchone()[0])
         log.info('Apartment: Committing transaction')
         conn.commit()
@@ -145,3 +140,15 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
         log.exception("Apartment: Couldn't insert successfully")
         raise
 
+
+if __name__ == '__main__':
+    connect()
+
+    apt_name = 'Körsbärsvägen 4 C / 1110'
+    apt_type = 'Enkelrum, (rum i korridor)'
+    apt_zone = 'Forum'
+    apt_price = 3799
+
+    set_apartment(apt_name, apt_type, apt_zone, apt_price)
+
+    disconnect()
