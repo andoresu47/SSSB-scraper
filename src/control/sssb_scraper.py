@@ -1,3 +1,4 @@
+# coding=utf-8
 """Module defining the spider that crawls SSSB website for data acquisition.
 
 """
@@ -50,12 +51,20 @@ class SSSBApartmentInfoSpider(scrapy.Spider):
         """
 
         n = int(response.xpath('(//strong)[1]/text()').extract()[0])
+        selectors = response.xpath('//div[contains(@class, \'ObjektIntro\')]')
 
         for i in range(1, n + 1):
-            l = SSSBApartmentLoader(item=SSSBApartmentItem(), response=response)
-            l.add_xpath('apt_name', '(//h4[@class=\'\\"ObjektAdress\\"\']/a)[{0}]/text()'.format(i))
-            l.add_xpath('apt_type', '(//h3[@class=\'\\"ObjektTyp\\"\']/a)[{0}]/text()'.format(i))
+            l = SSSBApartmentLoader(item=SSSBApartmentItem(), selector=selectors[i - 1])
+            l.add_xpath('apt_name', './/h4[@class=\'\\"ObjektAdress\\"\']/a/text()')
+            l.add_xpath('apt_type', './/h3[@class=\'\\"ObjektTyp\\"\']/a/text()')
             l.add_xpath('apt_zone', '(//dd[@class=\'\\"ObjektOmrade\\"\']/a)[{0}]/text()'.format(i))
+            l.add_xpath('apt_price', '(//dd[@class=\'\\"ObjektHyra\\"\'])[{0}]/text()'.format(i))
+            l.add_xpath('furnitured', u'.//div[@class=\'\\"ObjektEgenskaper\\"\']/div['
+                                      u'@data-title=\'\\"Möblerad\\"\']/span/text()')
+            l.add_xpath('electricity', u'.//div[@class=\'\\"ObjektEgenskaper\\"\']/div['
+                                       u'@data-title=\'\\"Elström\']/span/text()')
+            l.add_xpath('_10_month', u'.//div[@class=\'\\"ObjektEgenskaper\\"\']/div['
+                                     u'@data-title=\'\\"10-månadershyra\']/span/text()')
             yield l.load_item()
 
 
