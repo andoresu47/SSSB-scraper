@@ -1,3 +1,4 @@
+# coding=utf-8
 """Module for managing connections to sssb_data database, as well as manipulation of data.
 
 """
@@ -141,14 +142,14 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
         raise
 
 
-if __name__ == '__main__':
-    connect()
-
-    apt_name = 'Körsbärsvägen 4 C / 1110'
-    apt_type = 'Enkelrum, (rum i korridor)'
-    apt_zone = 'Forum'
-    apt_price = 3799
-
-    set_apartment(apt_name, apt_type, apt_zone, apt_price)
-
-    disconnect()
+# if __name__ == '__main__':
+#     connect()
+#
+#     apt_name = 'Körsbärsvägen 4 C / 1110'
+#     apt_type = 'Enkelrum, (rum i korridor)'
+#     apt_zone = 'Forum'
+#     apt_price = 3799
+#
+#     set_apartment(apt_name, apt_type, apt_zone, apt_price)
+#
+#     disconnect()

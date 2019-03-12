@@ -3,7 +3,7 @@ System designed to scrape apartment offering info from SSSB's website, analyze i
 
 ### Setting up database:
 #### As `root`:
-- `CREATE DATABASE sssb_data;`
+- `CREATE DATABASE sssb_data encoding='UTF8';`
 - `CREATE USER sssbuser WITH PASSWORD 'password';`
 - `GRANT ALL PRIVILEGES ON DATABASE "sssb_data" to sssbuser;`
 

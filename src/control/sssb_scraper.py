@@ -107,6 +107,13 @@ if __name__ == "__main__":
     # logging.getLogger('scrapy').propagate = False
     # logging.getLogger('market_data').propagate = False
     s = get_project_settings()
+    s.update({
+        'LOG_ENCODING ': None,
+        'ITEM_PIPELINES': {
+            'pipelines.SSSBApartmentPipeline': 400,
+        }
+    })
+
     process = CrawlerProcess(s)
 
     spider = SSSBApartmentInfoSpider()
