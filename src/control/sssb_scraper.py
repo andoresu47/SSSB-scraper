@@ -59,12 +59,12 @@ class SSSBApartmentInfoSpider(scrapy.Spider):
             l.add_xpath('apt_type', './/h3[@class=\'\\"ObjektTyp\\"\']/a/text()')
             l.add_xpath('apt_zone', '(//dd[@class=\'\\"ObjektOmrade\\"\']/a)[{0}]/text()'.format(i))
             l.add_xpath('apt_price', '(//dd[@class=\'\\"ObjektHyra\\"\'])[{0}]/text()'.format(i))
-            l.add_xpath('furnitured', u'.//div[@class=\'\\"ObjektEgenskaper\\"\']/div['
-                                      u'@data-title=\'\\"Möblerad\\"\']/span/text()')
-            l.add_xpath('electricity', u'.//div[@class=\'\\"ObjektEgenskaper\\"\']/div['
-                                       u'@data-title=\'\\"Elström\']/span/text()')
-            l.add_xpath('_10_month', u'.//div[@class=\'\\"ObjektEgenskaper\\"\']/div['
-                                     u'@data-title=\'\\"10-månadershyra\']/span/text()')
+            l.add_xpath('furnitured', './/div[@class=\'\\"ObjektEgenskaper\\"\']/div['
+                                      '@data-title=\'\\"Möblerad\\"\']/span/text()')
+            l.add_xpath('electricity', './/div[@class=\'\\"ObjektEgenskaper\\"\']/div['
+                                       '@data-title=\'\\"Elström\']/span/text()')
+            l.add_xpath('_10_month', './/div[@class=\'\\"ObjektEgenskaper\\"\']/div['
+                                     '@data-title=\'\\"10-månadershyra\']/span/text()')
             yield l.load_item()
 
 
