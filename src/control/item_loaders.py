@@ -1,6 +1,7 @@
 import datetime
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import TakeFirst, MapCompose, Join
+import re
 
 __author__ = 'Andres'
 
@@ -36,6 +37,24 @@ def get_first_space(x):
     """
 
     return x.split()[0]
+
+
+def get_second_space(x):
+    """Function to get the second element from a space splitting.
+
+    Args:
+        x: string to split.
+
+    Returns:
+        string: second element of space splitting.
+
+    """
+
+    return x.split()[1]
+
+
+def get_number(x):
+    return re.findall(r'\d+', x)[0]
 
 
 def set_boolean(x):
@@ -79,5 +98,11 @@ class SSSBApartmentStateLoader(ItemLoader):
 
     # Checks if parsed data is empty, in which case, the item is set to None
     default_input_processor = MapCompose(unicode.strip, is_empty)
+
+    apt_no_applicants_in = MapCompose(get_second_space, get_number)
+    apt_no_applicants_out = TakeFirst()
+
+    apt_top_credits_in = MapCompose(get_first_space)
+    apt_top_credits_out = TakeFirst()
 
     default_output_processor = Join()

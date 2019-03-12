@@ -15,7 +15,7 @@ from item_loaders import SSSBApartmentLoader, SSSBApartmentStateLoader
 from items import SSSBApartmentItem, SSSBApartmentStateItem
 
 
-def get_date():
+def get_timestamp():
     """Function to get today's date.
 
     Returns:
@@ -23,7 +23,7 @@ def get_date():
 
     """
 
-    return time.strftime("%Y%m%d").decode('utf-8')
+    return time.strftime('%Y-%m-%d %H:%M:%S').decode('utf-8')
 
 
 class SSSBApartmentInfoSpider(scrapy.Spider):
@@ -39,7 +39,7 @@ class SSSBApartmentInfoSpider(scrapy.Spider):
                   '&widgets%5B%5D=pagineringgofirst%40lagenheter&widgets%5B%5D=pagineringgonew%40lagenheter&widgets'
                   '%5B%5D=pagineringlista%40lagenheter&widgets%5B%5D=pagineringgoold%40lagenheter&widgets%5B%5D'
                   '=pagineringgolast%40lagenheter']
-    date = get_date()
+    date = get_timestamp()
 
     def parse(self, response):
         """Method in charge of retrieving relevant data from Bloomberg quotes
@@ -68,7 +68,7 @@ class SSSBApartmentInfoSpider(scrapy.Spider):
             yield l.load_item()
 
 
-class SSSBApartmentState(scrapy.Spider):
+class SSSBApartmentStateSpider(scrapy.Spider):
     """Class for scraping SSSB apartments dynamic info.
 
     """
@@ -81,7 +81,7 @@ class SSSBApartmentState(scrapy.Spider):
                   '&widgets%5B%5D=pagineringgofirst%40lagenheter&widgets%5B%5D=pagineringgonew%40lagenheter&widgets'
                   '%5B%5D=pagineringlista%40lagenheter&widgets%5B%5D=pagineringgoold%40lagenheter&widgets%5B%5D'
                   '=pagineringgolast%40lagenheter']
-    date = get_date()
+    date = get_timestamp()
 
     def parse(self, response):
         """Method in charge of retrieving dynamic data from a current apartment offering.
@@ -91,6 +91,17 @@ class SSSBApartmentState(scrapy.Spider):
 
         """
 
+        n = int(response.xpath('(//strong)[1]/text()').extract()[0])
+
+        for i in range(1, n + 1):
+            l = SSSBApartmentStateLoader(item=SSSBApartmentStateItem(), response=response)
+            l.add_value('state_timestamp', self.date)
+            l.add_xpath('apt_name', '(//h4[@class=\'\\"ObjektAdress\\"\']/a)[{0}]/text()'.format(i))
+            l.add_xpath('apt_no_applicants', '(//dd[@class=\'\\"ObjektAntalIntresse\'])[{0}]/text()'.format(i))
+            l.add_xpath('apt_top_credits', '(//dd[@class=\'\\"ObjektAntalIntresse\'])[{0}]/text()'.format(i))
+
+            yield l.load_item()
+
 
 if __name__ == "__main__":
     # logging.getLogger('scrapy').propagate = False
@@ -98,6 +109,7 @@ if __name__ == "__main__":
     s = get_project_settings()
     process = CrawlerProcess(s)
 
-    spider = SSSBApartmentInfoSpider()
+    # spider = SSSBApartmentInfoSpider()
+    spider = SSSBApartmentStateSpider()
     process.crawl(spider)
     process.start()  # the script will block here until the crawling is finished
