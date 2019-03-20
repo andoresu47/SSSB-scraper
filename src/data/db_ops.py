@@ -142,11 +142,11 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
                     VALUES (%s, %s, %s, %s, %s, %s, %s) 
                     RETURNING nIdapartment"""
         cur.execute(sql, (apt_name, apt_type, apt_zone, apt_price, furnitured, electricity, _10_month))
-        ticker_id = int(cur.fetchone()[0])
+        apartment_id = int(cur.fetchone()[0])
         log.info('Apartment: Committing transaction')
         conn.commit()
         cur.close()
-        return ticker_id
+        return apartment_id
     except Exception as e:
         conn.rollback()
         log.error('Apartment: Rolling back transaction')
@@ -178,10 +178,37 @@ def set_offer(start_date=get_timestamp(), end_date=None):
                     VALUES (%s, %s) 
                     RETURNING nIdOffer"""
         cur.execute(sql, (start_date, end_date))
-        asset_class_id = int(cur.fetchone()[0])
+        offer_id = int(cur.fetchone()[0])
         conn.commit()
         cur.close()
-        return asset_class_id
+        return offer_id
+    except Exception as e:
+        conn.rollback()
+        print("Class size is already present in table: " + str(e))
+        raise
+
+
+def set_is_offered(apt_address, time_stamp):
+    """Function for inserting a new valid row into the "is_offered" table.
+
+    Args:
+        apt_address: string representing an apartment's address.
+        time_stamp: string representing a timestamp in which the apartment is being offered.
+
+    Raises:
+        Exception: In case no insertion was possible.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        sql = """INSERT INTO is_offered (nIdApartment, nIdOffer) 
+                    VALUES (%s, %s)"""
+        cur.execute(sql, (get_apartment_id(apt_address), get_offer_id(time_stamp)))
+        conn.commit()
+        cur.close()
     except Exception as e:
         conn.rollback()
         print("Class size is already present in table: " + str(e))
