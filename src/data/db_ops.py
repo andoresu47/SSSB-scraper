@@ -11,6 +11,7 @@ import os
 import subprocess
 import pandas as pd
 from dotenv import load_dotenv
+import time
 
 # Initialization of global db connection and logging config.
 
@@ -100,6 +101,17 @@ def disconnect():
         raise DatabaseException("Unable to disconnect from database\n" + str(e))
 
 
+def get_timestamp():
+    """Function to get today's date.
+
+    Returns:
+         string: today's date in the format YYYYMMDD.
+
+    """
+
+    return time.strftime('%Y-%m-%d %H:%M:%S')
+
+
 def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', electricity='False', _10_month='False'):
     """Function for inserting a new valid row into the "apartment" table.
         In case of success the corresponding id is returned.
@@ -142,6 +154,40 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
         raise
 
 
+def set_offer(start_date=get_timestamp(), end_date=None):
+    """Function for inserting a new valid row into the "offer" table.
+        In case of success the corresponding id is returned.
+
+    Args:
+        start_date: string representing the starting date and time of an offer.
+        end_date: string representing the ending date and time of an offer.
+
+    Raises:
+        Exception: In case no insertion was possible.
+
+    Returns:
+        int: integer representing the inserted row ID.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        sql = """INSERT INTO offer (start_date, end_date) 
+                    VALUES (%s, %s) 
+                    RETURNING nIdOffer"""
+        cur.execute(sql, (start_date, end_date))
+        asset_class_id = int(cur.fetchone()[0])
+        conn.commit()
+        cur.close()
+        return asset_class_id
+    except Exception as e:
+        conn.rollback()
+        print("Class size is already present in table: " + str(e))
+        raise
+
+
 def get_apartment_id(address):
     """Function for retrieving the id of a certain apartment.
 
@@ -172,7 +218,74 @@ def get_apartment_id(address):
 
     except Exception as e:
         conn.rollback()
-        print("Couldn't retrieve nIdticker: " + str(e))
+        print("Couldn't retrieve apartment id: " + str(e))
+
+
+def get_offer_id(time_stamp):
+    """Function for retrieving the id of a certain apartment offering.
+
+    Args:
+        time_stamp: string representing an timestamp.
+
+    Returns:
+        int: integer representing the desired ID.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        sql = """SELECT nIdOffer 
+                  FROM Offer
+                  WHERE start_date <= %s AND end_date >= %s"""
+        cur.execute(sql, (time_stamp, time_stamp))
+        res = cur.fetchone()
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return res[0]
+        else:
+            return None
+
+    except Exception as e:
+        conn.rollback()
+        print("Couldn't retrieve offer id: " + str(e))
+
+
+def set_apartment_state(state_timestamp, apt_address, no_applicants, top_credits):
+    """Function in charge of inserting valid new rows into Tiingo_quote table.
+
+    Args:
+        state_timestamp: timestamp in which the data was retrieved.
+        apt_address: address representing an apartment.
+        no_applicants: number of applicants up to the corresponding timestamp.
+        top_credits: maximum credits from among applicants.
+
+    Raises:
+        DatabaseException: If something impedes to insert new data, such as repeated entries.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('Apartment State: Inserting state for: {0}'.format(apt_address))
+        sql = """INSERT INTO State (time_stamp, nIdApartment, nIdOffer, no_applicants, top_credits) 
+                    VALUES (%s, %s, %s, %s, %s)"""
+        offer = get_offer_id(state_timestamp)
+        cur.execute(sql, (state_timestamp, get_apartment_id(apt_address), offer, no_applicants, top_credits))
+
+        log.info('Apartment State: Committing transaction')
+        conn.commit()
+        cur.close()
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Apartment State: Rolling back transaction')
+        log.exception("Apartment State: Couldn't insert successfully")
+        raise DatabaseException()
 
 
 # if __name__ == '__main__':
@@ -183,7 +296,10 @@ def get_apartment_id(address):
 #     apt_zone = 'Forum'
 #     apt_price = 3799
 #
-#     # set_apartment(apt_name, apt_type, apt_zone, apt_price)
+#     set_apartment(apt_name, apt_type, apt_zone, apt_price)
 #     print(get_apartment_id(apt_name))
+#     offer = set_offer(get_timestamp(), '2019-03-31 22:40:01')
+#     offer = get_offer_id('2019-03-21 12:17:04')
+#     print(offer)
 #
 #     disconnect()
