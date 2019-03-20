@@ -142,6 +142,39 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
         raise
 
 
+def get_apartment_id(address):
+    """Function for retrieving the id of a certain apartment.
+
+    Args:
+        address: string representing an apartment.
+
+    Returns:
+        int: integer representing the desired ID.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        sql = """SELECT nIdapartment 
+                  FROM apartment
+                  WHERE name = %s"""
+        cur.execute(sql, (address,))
+        res = cur.fetchone()
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return int(res[0])
+        else:
+            conn.rollback()
+            print("No matching record found")
+
+    except Exception as e:
+        conn.rollback()
+        print("Couldn't retrieve nIdticker: " + str(e))
+
+
 # if __name__ == '__main__':
 #     connect()
 #
@@ -150,6 +183,7 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
 #     apt_zone = 'Forum'
 #     apt_price = 3799
 #
-#     set_apartment(apt_name, apt_type, apt_zone, apt_price)
+#     # set_apartment(apt_name, apt_type, apt_zone, apt_price)
+#     print(get_apartment_id(apt_name))
 #
 #     disconnect()
