@@ -118,12 +118,12 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
 
     Args:
         apt_name: string representing the address of an apartment.
-        apt_type:
-        apt_zone:
-        apt_price:
-        furnitured:
-        electricity:
-        _10_month:
+        apt_type: string representing an apartment type. E.g.: single room, room with kitchenette, etc.
+        apt_zone: string representing the general location of an apartment.
+        apt_price: monthly rent.
+        furnitured: true if furnitured, false otherwise.
+        electricity: true if electricity is included, false otherwise.
+        _10_month: true if the contract is for 10 months only, false otherwise.
 
     Raises:
         Exception: In case no insertion was possible.
