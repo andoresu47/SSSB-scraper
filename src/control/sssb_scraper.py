@@ -108,15 +108,16 @@ if __name__ == "__main__":
     # logging.getLogger('market_data').propagate = False
     s = get_project_settings()
     s.update({
+        'LOG_ENABLED': False,
         'LOG_ENCODING ': None,
         'ITEM_PIPELINES': {
-            'pipelines.SSSBApartmentPipeline': 400,
+            'pipelines.SSSBApartmentStatePipeline': 400,
         }
     })
 
     process = CrawlerProcess(s)
 
-    spider = SSSBApartmentInfoSpider()
-    # spider = SSSBApartmentStateSpider()
+    # spider = SSSBApartmentInfoSpider()
+    spider = SSSBApartmentStateSpider()
     process.crawl(spider)
     process.start()  # the script will block here until the crawling is finished

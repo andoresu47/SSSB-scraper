@@ -13,7 +13,7 @@ __author__ = 'Andres'
 
 
 class SSSBApartmentPipeline(object):
-    """Class for processing scraped items and insert them into database.
+    """Class for processing scraped apartment items and insert them into database.
 
     """
 
@@ -66,6 +66,64 @@ class SSSBApartmentPipeline(object):
 
         try:
             db_connection.set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured, electricity, _10_month)
+            return item
+
+        except DatabaseException as e:
+            print("Failure to insert some data: " + str(e))
+            return None
+
+
+class SSSBApartmentStatePipeline(object):
+    """Class for processing scraped apartment state items and insert them into database.
+
+    """
+
+    def __init__(self):
+        """Constructor for initializing connection to database and
+            insert counters, as well as spider closed signal.
+
+        """
+
+        # dispatcher.connect(self.spider_opened, signals.spider_opened)
+        dispatcher.connect(self.spider_closed, signals.spider_closed)
+
+        try:
+            db_connection.connect()
+        except DatabaseException as e:
+            print(str(e))
+
+    def spider_closed(self, spider):
+        """Method that sets action to do when the spider is closed,
+            in this case, close database connection and send slack
+            notification.
+
+        Args:
+            spider: spider calling this pipeline.
+
+        """
+
+        db_connection.disconnect()
+
+    def process_item(self, item, spider):
+        """Method in charge of validating scraped data and insert it into database.
+
+        Args:
+            item: scraped item to validate and insert into database.
+            spider: spider calling this pipeline.
+
+        Returns:
+            item: validated item, in case everything went smoothly.
+                    None, in case DatabaseException was raised when inserting to database.
+
+        """
+
+        state_timestamp = item['state_timestamp']
+        apt_name = item['apt_name']
+        apt_no_applicants = item['apt_no_applicants']
+        apt_top_credits = item['apt_top_credits']
+
+        try:
+            db_connection.set_apartment_state(state_timestamp, apt_name, apt_no_applicants, apt_top_credits)
             return item
 
         except DatabaseException as e:
