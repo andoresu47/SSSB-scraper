@@ -54,14 +54,48 @@ def get_second_space(x):
 
 
 def get_number(x):
+    """Function to extract a number out from a string which contains it.
+
+    Args:
+        x: string from which to extract the contained number.
+
+    Returns:
+        string: number contained in string.
+
+    """
+
     return re.findall(r'\d+', x)[0]
 
 
 def set_boolean(x):
+    """Function to assert if a string is empty or not.
+
+    Args:
+        x: possibly empty string.
+
+    Returns:
+        string: "true" or "false", depending on the input string.
+
+    """
+
     if x:
         return "True"
     else:
         return "False"
+
+
+def remove_extra_middle_spaces(x):
+    """Function to remove redundant whitespaces in input string.
+
+    Args:
+        x: string to strip.
+
+    Returns:
+        string: string without redundant whitespaces.
+
+    """
+
+    return " ".join(x.split())
 
 
 class SSSBApartmentLoader(ItemLoader):
@@ -71,6 +105,10 @@ class SSSBApartmentLoader(ItemLoader):
 
     # Checks if parsed data is empty, in which case, the item is set to None
     default_input_processor = MapCompose(str.strip, is_empty)
+
+    # Parsing of apartment address (name)
+    apt_name_in = MapCompose(remove_extra_middle_spaces)
+    apt_name_out = TakeFirst()
 
     # Parsing of price
     apt_price_in = MapCompose(get_first_space)
