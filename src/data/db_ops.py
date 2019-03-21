@@ -154,7 +154,7 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
         raise
 
 
-def set_offer(start_date=get_timestamp(), end_date=None):
+def set_offer(end_date, start_date=get_timestamp()):
     """Function for inserting a new valid row into the "offer" table.
         In case of success the corresponding id is returned.
 
@@ -174,17 +174,21 @@ def set_offer(start_date=get_timestamp(), end_date=None):
 
     cur = conn.cursor()
     try:
+        log.info('Offer: Inserting new offer: {0}'.format(end_date))
         sql = """INSERT INTO offer (start_date, end_date) 
                     VALUES (%s, %s) 
                     RETURNING nIdOffer"""
         cur.execute(sql, (start_date, end_date))
         offer_id = int(cur.fetchone()[0])
+        log.info('Offer: Committing transaction')
         conn.commit()
         cur.close()
         return offer_id
     except Exception as e:
         conn.rollback()
-        print("Class size is already present in table: " + str(e))
+        log.error('Offer: Rolling back transaction')
+        log.exception("Offer: Couldn't insert successfully")
+        print("Couldn't insert offer: " + str(e))
         raise
 
 
@@ -204,84 +208,28 @@ def set_is_offered(apt_address, time_stamp):
 
     cur = conn.cursor()
     try:
-        sql = """INSERT INTO is_offered (nIdApartment, nIdOffer) 
+        log.info('Apartment-Offer: Inserting new relationship: {0}-{1}'.format(apt_address, time_stamp))
+        sql = """INSERT INTO isOffered (nIdApartment, nIdOffer) 
                     VALUES (%s, %s)"""
-        cur.execute(sql, (get_apartment_id(apt_address), get_offer_id(time_stamp)))
+        apt_id = get_apartment_id(apt_address)
+        offer_id = get_offer_id(time_stamp)
+        if offer_id is None:
+            offer_id = set_offer(time_stamp)
+
+        cur.execute(sql, (apt_id, offer_id))
+        log.info('Apartment-Offer: Committing transaction')
         conn.commit()
         cur.close()
     except Exception as e:
         conn.rollback()
-        print("Class size is already present in table: " + str(e))
+        log.error('Apartment-Offer: Rolling back transaction')
+        log.exception("Apartment-Offer: Couldn't insert successfully")
+        print("Couldn't insert apartment-offer relation: " + str(e))
         raise
 
 
-def get_apartment_id(address):
-    """Function for retrieving the id of a certain apartment.
-
-    Args:
-        address: string representing an apartment.
-
-    Returns:
-        int: integer representing the desired ID.
-
-    """
-
-    global conn, log
-
-    cur = conn.cursor()
-    try:
-        sql = """SELECT nIdapartment 
-                  FROM apartment
-                  WHERE name = %s"""
-        cur.execute(sql, (address,))
-        res = cur.fetchone()
-        conn.commit()
-        cur.close()
-        if res is not None:
-            return int(res[0])
-        else:
-            conn.rollback()
-            print("No matching record found")
-
-    except Exception as e:
-        conn.rollback()
-        print("Couldn't retrieve apartment id: " + str(e))
-
-
-def get_offer_id(time_stamp):
-    """Function for retrieving the id of a certain apartment offering.
-
-    Args:
-        time_stamp: string representing an timestamp.
-
-    Returns:
-        int: integer representing the desired ID.
-
-    """
-
-    global conn, log
-
-    cur = conn.cursor()
-    try:
-        sql = """SELECT nIdOffer 
-                  FROM Offer
-                  WHERE start_date <= %s AND end_date >= %s"""
-        cur.execute(sql, (time_stamp, time_stamp))
-        res = cur.fetchone()
-        conn.commit()
-        cur.close()
-        if res is not None:
-            return res[0]
-        else:
-            return None
-
-    except Exception as e:
-        conn.rollback()
-        print("Couldn't retrieve offer id: " + str(e))
-
-
 def set_apartment_state(state_timestamp, apt_address, no_applicants, top_credits):
-    """Function in charge of inserting valid new rows into Tiingo_quote table.
+    """Function in charge of inserting valid new rows into apartment State table.
 
     Args:
         state_timestamp: timestamp in which the data was retrieved.
@@ -313,6 +261,81 @@ def set_apartment_state(state_timestamp, apt_address, no_applicants, top_credits
         log.error('Apartment State: Rolling back transaction')
         log.exception("Apartment State: Couldn't insert successfully")
         raise DatabaseException()
+
+
+def get_apartment_id(address):
+    """Function for retrieving the id of a certain apartment.
+
+    Args:
+        address: string representing an apartment.
+
+    Returns:
+        int: integer representing the desired ID.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('Apartment (get): Querying for: {0}'.format(address))
+        sql = """SELECT nIdapartment 
+                  FROM apartment
+                  WHERE name = %s"""
+        cur.execute(sql, (address,))
+        res = cur.fetchone()
+        log.info('Apartment (get): Committing transaction')
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return int(res[0])
+        else:
+            conn.rollback()
+            log.error('Apartment (get): Rolling back transaction')
+            log.exception("Apartment (get): No matching record found")
+            print("No matching record found")
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Apartment (get): Rolling back transaction')
+        log.exception("Apartment (get): Couldn't retrieve apartment id")
+        print("Couldn't retrieve apartment id: " + str(e))
+
+
+def get_offer_id(time_stamp):
+    """Function for retrieving the id of a certain apartment offering.
+
+    Args:
+        time_stamp: string representing an timestamp.
+
+    Returns:
+        int: integer representing the desired ID.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('Offer (get): Querying for: {0}'.format(time_stamp))
+        sql = """SELECT nIdOffer 
+                  FROM Offer
+                  WHERE start_date <= %s AND end_date >= %s"""
+        cur.execute(sql, (time_stamp, time_stamp))
+        res = cur.fetchone()
+        log.info('Offer (get): Committing transaction')
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return res[0]
+        else:
+            return None
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Offer (get): Rolling back transaction')
+        log.exception("Offer (get): Couldn't retrieve offer id")
+        print("Couldn't retrieve offer id: " + str(e))
 
 
 # if __name__ == '__main__':
