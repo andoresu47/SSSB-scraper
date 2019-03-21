@@ -338,6 +338,39 @@ def get_offer_id(time_stamp):
         DatabaseException(str(e))
 
 
+def get_current_offer_dates():
+    """Function for retrieving the start and end dates of the current apartment offering.
+
+    Returns:
+        (datetime.datetime, datetime.datetime): tuple representing the desired timestamps.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('Offer (get): Querying for last offer')
+        sql = """SELECT start_date, end_date from offer 
+                    GROUP BY nidoffer 
+                    HAVING nidoffer = max(nidoffer)"""
+        cur.execute(sql)
+        res = cur.fetchall()
+        log.info('Offer (get): Committing transaction')
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return res[0]
+        else:
+            return None
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Offer (get): Rolling back transaction')
+        log.exception("Offer (get): Couldn't retrieve dates")
+        DatabaseException(str(e))
+
+
 # if __name__ == '__main__':
 #     connect()
 #
