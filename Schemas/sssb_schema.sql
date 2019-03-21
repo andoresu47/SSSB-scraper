@@ -35,7 +35,7 @@ CREATE TABLE Offer(
 CREATE TABLE State(
     nIdState                            SERIAL                                        ,
     time_stamp                          TIMESTAMPTZ                                   ,
-    nIdApartment                        INT                                           ,
+    nIdApartment                        INT                   NOT NULL                ,
     nIdOffer                            INT                                           ,
     no_applicants                       INT                   NOT NULL                ,
     top_credits                         INT                   NOT NULL                ,
@@ -46,8 +46,8 @@ CREATE TABLE State(
 );
 
 CREATE TABLE IsOffered(
-    nIdApartment                        INT                                         ,
-    nIdOffer                            INT                                         ,
+    nIdApartment                        INT           NOT NULL                              ,
+    nIdOffer                            INT           NOT NULL                              ,
     win_credits                         INT                                         ,
     CONSTRAINT fk_offer_nIdApartment    FOREIGN KEY (nIdApartment)      REFERENCES Apartment(nIdApartment)     ,
     CONSTRAINT fk_offer_nIdOffer        FOREIGN KEY (nIdOffer)          REFERENCES Offer(nIdOffer)             ,
