@@ -151,7 +151,7 @@ def set_apartment(apt_name, apt_type, apt_zone, apt_price, furnitured='False', e
         conn.rollback()
         log.error('Apartment: Rolling back transaction')
         log.exception("Apartment: Couldn't insert successfully")
-        raise
+        raise DatabaseException(str(e))
 
 
 def set_offer(end_date, start_date=get_timestamp()):
@@ -189,7 +189,7 @@ def set_offer(end_date, start_date=get_timestamp()):
         log.error('Offer: Rolling back transaction')
         log.exception("Offer: Couldn't insert successfully")
         print("Couldn't insert offer: " + str(e))
-        raise
+        raise DatabaseException(str(e))
 
 
 def set_is_offered(apt_address, time_stamp):
@@ -225,7 +225,7 @@ def set_is_offered(apt_address, time_stamp):
         log.error('Apartment-Offer: Rolling back transaction')
         log.exception("Apartment-Offer: Couldn't insert successfully")
         print("Couldn't insert apartment-offer relation: " + str(e))
-        raise
+        raise DatabaseException(str(e))
 
 
 def set_apartment_state(state_timestamp, apt_address, no_applicants, top_credits):
@@ -260,7 +260,7 @@ def set_apartment_state(state_timestamp, apt_address, no_applicants, top_credits
         conn.rollback()
         log.error('Apartment State: Rolling back transaction')
         log.exception("Apartment State: Couldn't insert successfully")
-        raise DatabaseException()
+        raise DatabaseException(str(e))
 
 
 def get_apartment_id(address):
@@ -299,7 +299,7 @@ def get_apartment_id(address):
         conn.rollback()
         log.error('Apartment (get): Rolling back transaction')
         log.exception("Apartment (get): Couldn't retrieve apartment id")
-        print("Couldn't retrieve apartment id: " + str(e))
+        DatabaseException(str(e))
 
 
 def get_offer_id(time_stamp):
@@ -335,7 +335,7 @@ def get_offer_id(time_stamp):
         conn.rollback()
         log.error('Offer (get): Rolling back transaction')
         log.exception("Offer (get): Couldn't retrieve offer id")
-        print("Couldn't retrieve offer id: " + str(e))
+        DatabaseException(str(e))
 
 
 # if __name__ == '__main__':
