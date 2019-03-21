@@ -137,6 +137,10 @@ class SSSBApartmentStateLoader(ItemLoader):
     # Checks if parsed data is empty, in which case, the item is set to None
     default_input_processor = MapCompose(str.strip, is_empty)
 
+    # Parsing of apartment address (name)
+    apt_name_in = MapCompose(remove_extra_middle_spaces)
+    apt_name_out = TakeFirst()
+
     apt_no_applicants_in = MapCompose(get_second_space, get_number)
     apt_no_applicants_out = TakeFirst()
 
