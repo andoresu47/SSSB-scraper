@@ -371,6 +371,39 @@ def get_current_offer_dates():
         DatabaseException(str(e))
 
 
+def get_current_offer_size():
+    """Function for getting the number of apartments currently being offered.
+
+    Returns:
+        int: size of the current offering.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('IsOffered (get): Querying for last offer size')
+        sql = """SELECT count(*) from isoffered 
+                    GROUP BY nidoffer 
+                    HAVING nidoffer = max(nidoffer)"""
+        cur.execute(sql)
+        res = cur.fetchall()
+        log.info('IsOffered (get): Committing transaction')
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return int(res[0][0])
+        else:
+            return None
+
+    except Exception as e:
+        conn.rollback()
+        log.error('IsOffered (get): Rolling back transaction')
+        log.exception("IsOffered (get): Couldn't retrieve size")
+        DatabaseException(str(e))
+
+
 # if __name__ == '__main__':
 #     connect()
 #
