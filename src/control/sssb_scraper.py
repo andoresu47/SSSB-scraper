@@ -104,8 +104,6 @@ class SSSBApartmentStateSpider(scrapy.Spider):
 
 
 if __name__ == "__main__":
-    # logging.getLogger('scrapy').propagate = False
-    # logging.getLogger('market_data').propagate = False
     s = get_project_settings()
     s.update({
         'LOG_ENABLED': False,
