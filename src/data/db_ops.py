@@ -27,7 +27,7 @@ db_pass = os.getenv("DB_PASS")
 
 dirname = os.path.dirname(__file__)
 hdlr = logging.FileHandler(os.path.join(dirname,
-                                        '..\\..\\Logs\\SSSBData.log'),
+                                        '../../Logs/SSSBData.log'),
                            encoding="UTF-8")
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
