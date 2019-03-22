@@ -10,6 +10,7 @@ import logging
 import os
 import subprocess
 import pandas as pd
+import pandas.io.sql as sqlio
 from dotenv import load_dotenv
 import time
 
@@ -399,6 +400,31 @@ def get_current_offer_size():
             return int(res[0][0])
         else:
             return None
+
+    except Exception as e:
+        conn.rollback()
+        log.error('IsOffered (get): Rolling back transaction')
+        log.exception("IsOffered (get): Couldn't retrieve size")
+        DatabaseException(str(e))
+
+
+def get_apartment_history(apt_name, offer):
+    """Function for getting the historical for an apartment filtered by offer run.
+
+    Returns:
+        pandas.DataFrame: data frame representing the apartment timeseries.
+
+    """
+
+    global conn, log
+
+    try:
+        log.info('Apartment State (get): Querying historical data')
+        sql = """SELECT * from state 
+                        WHERE nidApartment = %s 
+                        AND nidOffer = %s"""
+        df = sqlio.read_sql_query(sql, conn, params=(get_apartment_id(apt_name), offer))
+        return df
 
     except Exception as e:
         conn.rollback()
