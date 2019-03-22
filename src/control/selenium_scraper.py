@@ -10,7 +10,7 @@ import os
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 import src.data.db_ops as db_connection
 from src.data.db_ops import DatabaseException
 
@@ -104,9 +104,10 @@ class SSSBApartmentOffer:
             current_apt.click()
 
             # Wait until the apartment info is loaded
+            self.browser.implicitly_wait(2)
             try:
                 apt_name = WebDriverWait(self.browser, 15).until(
-                    EC.presence_of_element_located(
+                    EC.visibility_of_element_located(
                         (By.XPATH,
                          '//*[@id="SubNavigationContentContainer"]/div/div/div[1]/div[2]/h1'
                          )))
@@ -114,7 +115,7 @@ class SSSBApartmentOffer:
                 apt_name = apt_name.text
 
                 offering = WebDriverWait(self.browser, 15).until(
-                    EC.presence_of_element_located(
+                    EC.visibility_of_element_located(
                         (By.XPATH,
                          '//*[@id="SubNavigationContentContainer"]/div/div/div[1]/div[6]/div'
                          )))
@@ -126,6 +127,10 @@ class SSSBApartmentOffer:
 
             except TimeoutException:
                 print("Loading apartment took too much time!")
+                return None
+
+            except StaleElementReferenceException as e:
+                print("Error getting element")
                 return None
 
         except TimeoutException as e:
