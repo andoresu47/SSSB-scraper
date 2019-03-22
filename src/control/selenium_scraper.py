@@ -33,7 +33,8 @@ class SSSBApartmentOffer:
         # Headless browser
         options = webdriver.FirefoxOptions()
         options.add_argument('-headless')
-        self.browser = webdriver.Firefox(executable_path=os.path.join(dirname, '../../Dependencies/Selenium/geckodriver'))
+        self.browser = webdriver.Firefox(executable_path=os.path.join(dirname, '../../Dependencies/Selenium/geckodriver'),
+                                         options=options)
         self.browser.set_page_load_timeout(30)
         self.browser.get(SSSB_FRONTPAGE)
 
