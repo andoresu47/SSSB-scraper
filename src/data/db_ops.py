@@ -210,13 +210,16 @@ def set_is_offered(apt_address, time_stamp):
     try:
         log.info('Apartment-Offer: Inserting new relationship: {0}-{1}'.format(apt_address, time_stamp))
         sql = """INSERT INTO isOffered (nIdApartment, nIdOffer) 
-                    VALUES (%s, %s)"""
+            SELECT %s, %s
+              WHERE NOT EXISTS (
+                SELECT 1 FROM isOffered WHERE nidApartment=%s and nIdOffer=%s
+        )"""
         apt_id = get_apartment_id(apt_address)
         offer_id = get_offer_id(time_stamp)
         if offer_id is None:
             offer_id = set_offer(time_stamp)
 
-        cur.execute(sql, (apt_id, offer_id))
+        cur.execute(sql, (apt_id, offer_id, apt_id, offer_id))
         log.info('Apartment-Offer: Committing transaction')
         conn.commit()
         cur.close()
