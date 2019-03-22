@@ -1,11 +1,10 @@
 from src.control.sssb_scraper import SSSBApartmentInfoSpider, SSSBApartmentStateSpider
-from scrapy.crawler import CrawlerProcess
+from scrapy.crawler import CrawlerProcess, CrawlerRunner
 from scrapy.utils.project import get_project_settings
 import time
-import datetime
 import src.data.db_ops as db_connection
 from src.data.db_ops import DatabaseException
-from src.control.selenium_scraper import ApartmentException, SSSBApartmentOffer
+from src.control.selenium_scraper import SSSBApartmentOffer
 
 
 def get_timestamp():
@@ -86,7 +85,10 @@ def scrape_offering():
 
 def get_live_offering_size():
     sssb_selenium = SSSBApartmentOffer()
-    return sssb_selenium.get_no_apartments()
+    no_apts = sssb_selenium.get_no_apartments()
+    sssb_selenium.close_browser()
+    return no_apts
+
 
 def get_db_offering_size():
     db_conn_status = db_connection.is_connected()
@@ -104,26 +106,3 @@ def get_db_offering_size():
     finally:
         if not db_conn_status:
             db_connection.disconnect()
-
-
-if __name__ == '__main__':
-    # Current offer timestamps
-    start_date, end_date = get_last_offer_timestamps()
-    timezone = start_date.tzinfo
-    current_timestamp = datetime.datetime.now(timezone)
-
-    # Current offer size
-    db_size = get_db_offering_size()
-    live_size = get_live_offering_size()
-
-    if live_size != db_size:
-        scrape_apartments()
-        scrape_offering()
-
-    if start_date <= current_timestamp <= end_date:
-        scrape_apartment_states()
-    elif end_date < current_timestamp:
-        scrape_apartments()
-        scrape_offering()
-    else:
-        raise Exception("Error in timestamps")
