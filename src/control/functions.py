@@ -5,6 +5,10 @@ import time
 import src.data.db_ops as db_connection
 from src.data.db_ops import DatabaseException
 from src.control.selenium_scraper import SSSBApartmentOffer
+import json
+import requests
+import os
+from dotenv import load_dotenv
 
 
 def get_timestamp():
@@ -106,3 +110,22 @@ def get_db_offering_size():
     finally:
         if not db_conn_status:
             db_connection.disconnect()
+
+
+def send_slack_notification(error=False):
+    dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+    load_dotenv(dotenv_path)
+    webhook_url = os.getenv("SLACK_WEBHOOK")
+    slack_data = {'text': "Everything working nicely! :tada:"}
+    if error:
+        slack_data = {'text': "Whoops! Something went wrong. Please fix me :cry:"}
+
+    response = requests.post(
+        webhook_url, data=json.dumps(slack_data),
+        headers={'Content-Type': 'application/json'}
+    )
+    if response.status_code != 200:
+        raise ValueError(
+            'Request to slack returned an error %s, the response is:\n%s'
+            % (response.status_code, response.text)
+        )
