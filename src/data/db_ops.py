@@ -355,9 +355,10 @@ def get_current_offer_dates():
     cur = conn.cursor()
     try:
         log.info('Offer (get): Querying for last offer')
-        sql = """SELECT start_date, end_date from offer 
-                    GROUP BY nidoffer 
-                    HAVING nidoffer = max(nidoffer)"""
+        sql = """SELECT start_date, end_date 
+                    FROM offer 
+                    ORDER BY nidoffer 
+                    DESC limit 1"""
         cur.execute(sql)
         res = cur.fetchall()
         log.info('Offer (get): Committing transaction')

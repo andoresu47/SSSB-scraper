@@ -13,6 +13,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 import src.data.db_ops as db_connection
 from src.data.db_ops import DatabaseException
+from pytz import timezone
+from datetime import datetime
 
 SSSB_FRONTPAGE = 'https://www.sssb.se/en'
 SSSB_AVAILABLE_APARTMENTS = 'https://www.sssb.se/en/find-apartment/apply-for-apartment/available-apartments' \
@@ -124,7 +126,11 @@ class SSSBApartmentOffer:
                 split_text = offering.split()
                 end_date_and_time = '{0} {1}:00'.format(split_text[3], split_text[5])
 
-                return [apt_name, end_date_and_time]
+                datetime_object_raw = datetime.strptime(end_date_and_time, '%Y-%m-%d %H:%M:%S')
+                current_tz = timezone('Europe/Stockholm')
+                datetime_object = current_tz.localize(datetime_object_raw.replace(tzinfo=None))
+
+                return [apt_name, datetime_object]
 
             except TimeoutException:
                 print("Loading apartment took too much time!")
