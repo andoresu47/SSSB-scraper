@@ -396,7 +396,7 @@ def get_current_offer_size():
         log.info('IsOffered (get): Committing transaction')
         conn.commit()
         cur.close()
-        if res is not None:
+        if res:
             return int(res[0][0])
         else:
             return None
@@ -436,15 +436,18 @@ def get_apartment_history(apt_name, offer):
 # if __name__ == '__main__':
 #     connect()
 #
-#     apt_name = 'Körsbärsvägen 4 C / 1110'
-#     apt_type = 'Enkelrum, (rum i korridor)'
-#     apt_zone = 'Forum'
-#     apt_price = 3799
+#     # apt_name = 'Körsbärsvägen 4 C / 1110'
+#     # apt_type = 'Enkelrum, (rum i korridor)'
+#     # apt_zone = 'Forum'
+#     # apt_price = 3799
+#     #
+#     # set_apartment(apt_name, apt_type, apt_zone, apt_price)
+#     # print(get_apartment_id(apt_name))
+#     # offer = set_offer(get_timestamp(), '2019-03-31 22:40:01')
+#     # offer = get_offer_id('2019-03-21 12:17:04')
+#     # print(offer)
 #
-#     set_apartment(apt_name, apt_type, apt_zone, apt_price)
-#     print(get_apartment_id(apt_name))
-#     offer = set_offer(get_timestamp(), '2019-03-31 22:40:01')
-#     offer = get_offer_id('2019-03-21 12:17:04')
-#     print(offer)
+#     r = get_current_offer_size()
+#     print(r)
 #
 #     disconnect()
