@@ -429,8 +429,56 @@ def get_apartment_history(apt_name, offer):
 
     except Exception as e:
         conn.rollback()
-        log.error('IsOffered (get): Rolling back transaction')
-        log.exception("IsOffered (get): Couldn't retrieve size")
+        log.error('Apartment State (get): Rolling back transaction')
+        log.exception("Apartment State (get): Couldn't retrieve historical data")
+        DatabaseException(str(e))
+
+
+def get_secured_apartments(credit_days):
+    global conn, log
+
+    try:
+        log.info('Apartment State (get): Querying historical data')
+        sql = """ select * from apartment where nidapartment in (
+                    select nidapartment from state 
+                    where top_credits < %s 
+                    and time_stamp in (
+                      select time_stamp from state 
+                      order by time_stamp 
+                      desc limit 1
+                      )
+                    )"""
+        df = sqlio.read_sql_query(sql, conn, params=(credit_days,))
+        return df
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Apartment State (get): Rolling back transaction')
+        log.exception("Apartment State (get): Couldn't retrieve data")
+        DatabaseException(str(e))
+
+
+def get_current_state():
+    global conn, log
+
+    try:
+        log.info('Apartment State (get): Querying last timestamp')
+        sql = """select state.nidapartment, name, type, top_credits, no_applicants from state 
+                  join apartment 
+                  on state.nidapartment = apartment.nidapartment 
+                  where state.time_stamp in (
+                    select time_stamp from state 
+                    order by time_stamp 
+                    desc limit 1
+                  ) 
+                  group by apartment.type, state.top_credits, state.no_applicants, state.nidapartment, apartment.name;"""
+        df = sqlio.read_sql_query(sql, conn)
+        return df
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Apartment State (get): Rolling back transaction')
+        log.exception("Apartment State (get): Couldn't retrieve data")
         DatabaseException(str(e))
 
 
