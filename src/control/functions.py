@@ -16,7 +16,6 @@ def get_timestamp():
 
     Returns:
          string: today's date in the format YYYYMMDD.
-
     """
 
     return time.strftime('%Y-%m-%d %H:%M:%S')
@@ -47,6 +46,10 @@ def get_last_offer_timestamps():
 
 
 def scrape_apartments():
+    """ Function to scrape meta data about available apartments via a Scrapy spider,
+    which inserts the acquired data into a database.
+    """
+
     s = get_project_settings()
     s.update({
         'LOG_ENABLED': False,
@@ -64,6 +67,10 @@ def scrape_apartments():
 
 
 def scrape_apartment_states():
+    """ Function to scrape dynamic data about available apartments via a Scrapy spider,
+        which inserts the acquired data into a database.
+    """
+
     s = get_project_settings()
     s.update({
         'LOG_ENABLED': False,
@@ -81,6 +88,10 @@ def scrape_apartment_states():
 
 
 def scrape_offering():
+    """ Function to scrape timing data about an apartment offering via a Selenium crawler,
+        which inserts the acquired data into a database.
+    """
+
     sssb_selenium = SSSBApartmentOffer()
     try:
         sssb_selenium.login()
@@ -91,6 +102,13 @@ def scrape_offering():
 
 
 def get_live_offering_size():
+    """ Function to get the number of apartments currently being offered from the
+    SSSB website.
+
+    Returns:
+        int: number of apartments in live offering.
+    """
+
     sssb_selenium = SSSBApartmentOffer()
     try:
         no_apts = sssb_selenium.get_no_apartments()
@@ -101,6 +119,13 @@ def get_live_offering_size():
 
 
 def get_db_offering_size():
+    """ Function to get the number of apartments currently stored in the database
+    fr the last available offering.
+
+    Returns:
+        int: number of apartments in last db-inserted offering.
+    """
+
     db_conn_status = db_connection.is_connected()
 
     if not db_conn_status:

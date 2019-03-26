@@ -1,3 +1,7 @@
+"""Script for uploading dynamic apartment data from the SSSB website.
+
+"""
+
 import datetime
 import src.control.functions as fn
 

@@ -43,6 +43,9 @@ class SSSBApartmentOffer:
         self.logged_in = False
 
     def login(self):
+        """Method to login into the SSSB webpage.
+        """
+
         dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
         load_dotenv(dotenv_path)
         sssb_username = os.getenv("SSSB_USERNAME")
@@ -76,6 +79,11 @@ class SSSBApartmentOffer:
             print("Could not login:\n\t" + str(e))
 
     def get_no_apartments(self):
+        """Method to get the number of apartments currently being offered.
+
+        Returns:
+            int: no. of apartments being offered.
+        """
         self.browser.get(SSSB_AVAILABLE_APARTMENTS)
 
         try:
@@ -94,6 +102,17 @@ class SSSBApartmentOffer:
             raise
 
     def get_apartment_and_offer(self, index):
+        """Method to get the name and offer deadline for an apartment identified by their position in the
+        available-apartments list.
+
+        Args:
+            index: position in the available apartments list view.
+
+        Returns:
+            list: list containing the name of the current apartment (position 0),
+                    as well as the date defining its offer deadline (position 1).
+        """
+
         self.browser.get(SSSB_AVAILABLE_APARTMENTS)
 
         try:
@@ -145,6 +164,10 @@ class SSSBApartmentOffer:
             return None
 
     def scrape_offering(self):
+        """Method to systematically obtain the name and offer deadline for each available apartment and
+        insert it into the database.
+        """
+
         if self.logged_in:
             no_apts = self.get_no_apartments()
 
@@ -190,11 +213,7 @@ class SSSBApartmentOffer:
             print("Cannot get offering. Not logged in.")
 
     def close_browser(self):
+        """Method to close the current webdriver session and all open Firefox windows spawned by this class.
+        """
+
         self.browser.quit()
-
-
-if __name__ == '__main__':
-    sssb_selenium = SSSBApartmentOffer()
-    sssb_selenium.login()
-    sssb_selenium.scrape_offering()
-    sssb_selenium.close_browser()

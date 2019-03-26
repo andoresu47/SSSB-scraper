@@ -413,7 +413,7 @@ def get_apartment_history(apt_name, offer):
     """Function for getting the historical for an apartment filtered by offer run.
 
     Returns:
-        pandas.DataFrame: data frame representing the apartment timeseries.
+        pandas.DataFrame: data frame object representing the apartment timeseries.
 
     """
 
@@ -435,6 +435,16 @@ def get_apartment_history(apt_name, offer):
 
 
 def get_secured_apartments(credit_days):
+    """Function to get the apartments which, as of the last inserted timestamp, have less
+    credits than the given number.
+
+    Args:
+        credit_days: number of credits days for determining safe apartment bets.
+
+    Returns:
+        pandas.DataFrame: data frame object containing desired apartments, if any.
+    """
+
     global conn, log
 
     try:
@@ -459,6 +469,13 @@ def get_secured_apartments(credit_days):
 
 
 def get_current_state():
+    """Function to get a snapshot of the currently available apartments ordered by type,
+    top credits and number of applicants.
+
+    Returns:
+        pandas.DataFrame: data frame object containing ordered apartment state snapshot.
+    """
+
     global conn, log
 
     try:

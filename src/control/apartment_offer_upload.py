@@ -1,3 +1,7 @@
+"""Script for uploading apartment meta data from the SSSB website.
+
+"""
+
 import src.control.functions as fn
 
 if __name__ == '__main__':
