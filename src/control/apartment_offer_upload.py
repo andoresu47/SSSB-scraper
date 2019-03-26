@@ -10,7 +10,7 @@ if __name__ == '__main__':
         if live_size != db_size:
             fn.scrape_apartments()
             fn.scrape_offering()
-        fn.send_slack_notification(error=False)
+        fn.send_slack_notification("Apartment offer upload", 1)
 
     except Exception as e:
-        fn.send_slack_notification(error=True)
+        fn.send_slack_notification("Apartment offer upload", 0, str(e))

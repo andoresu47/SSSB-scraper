@@ -17,7 +17,7 @@ if __name__ == '__main__':
         else:
             raise Exception("Error in timestamps")
 
-        fn.send_slack_notification(error=False)
+        fn.send_slack_notification("Apartment state upload", 1)
 
     except Exception as e:
-        fn.send_slack_notification(error=True)
+        fn.send_slack_notification("Apartment offer upload", 0, str(e))
