@@ -251,6 +251,34 @@ def get_applicants_hist(offer_id, apartment_list):
             db_connection.disconnect()
 
 
+def get_offered_apartments_by_type(offer_id, type):
+    """ Function to get a list of apartment ids having a given type for the given offer.
+
+    Args:
+        offer_id: id of desired apartment offering.
+        type: apartment type to use for filtering results.
+
+    Returns:
+        list: list containing the ids of the desired apartments.
+    """
+
+    db_conn_status = db_connection.is_connected()
+
+    if not db_conn_status:
+        db_connection.connect()
+
+    try:
+        apt_list = db_connection.get_offered_apartments_by_type(offer_id, type)
+        return apt_list
+
+    except DatabaseException as e:
+        print(str(e))
+
+    finally:
+        if not db_conn_status:
+            db_connection.disconnect()
+
+
 def plot_time_series(series, data=None):
     """ Function to generate a plot of the top credits or number of applicants time series.
 

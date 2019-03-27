@@ -655,3 +655,34 @@ def get_offered_apartments(offer_id):
         log.error('Is Offered (get): Rolling back transaction')
         log.exception("Is Offered (get): Couldn't retrieve apartments ids")
         DatabaseException(str(e))
+
+
+def get_offered_apartments_by_type(offer_id, type):
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('Is Offered (get): Querying for apartments ids')
+        sql = """SELECT apartment.nIdapartment 
+                          FROM isoffered join apartment
+                          ON isoffered.nidapartment = apartment.nidapartment
+                          WHERE nidoffer = %s 
+                          AND apartment.type = %s"""
+        cur.execute(sql, (offer_id, type))
+        res = cur.fetchall()
+        log.info('Is Offered (get): Committing transaction')
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return [r[0] for r in res]
+        else:
+            conn.rollback()
+            log.error('Is Offered (get): Rolling back transaction')
+            log.exception("Is Offered (get): No matching records found")
+            print("No matching records found")
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Is Offered (get): Rolling back transaction')
+        log.exception("Is Offered (get): Couldn't retrieve apartments ids")
+        DatabaseException(str(e))
