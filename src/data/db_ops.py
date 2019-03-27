@@ -13,6 +13,7 @@ import pandas as pd
 import pandas.io.sql as sqlio
 from dotenv import load_dotenv
 import time
+from matplotlib import pyplot as plt
 
 # Initialization of global db connection and logging config.
 
@@ -376,6 +377,40 @@ def get_current_offer_dates():
         DatabaseException(str(e))
 
 
+def get_current_offer_id():
+    """Function for retrieving the id of the current apartment offering.
+
+    Returns:
+        int: integer representing the desired id.
+
+    """
+
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('Offer (get): Querying for last offer')
+        sql = """SELECT nidoffer 
+                    FROM offer 
+                    ORDER BY nidoffer 
+                    DESC limit 1"""
+        cur.execute(sql)
+        res = cur.fetchone()
+        log.info('Offer (get): Committing transaction')
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return res[0]
+        else:
+            return None
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Offer (get): Rolling back transaction')
+        log.exception("Offer (get): Couldn't retrieve dates")
+        DatabaseException(str(e))
+
+
 def get_current_offer_size():
     """Function for getting the number of apartments currently being offered.
 
@@ -409,8 +444,12 @@ def get_current_offer_size():
         DatabaseException(str(e))
 
 
-def get_apartment_history(apt_name, offer):
+def get_apartment_history(apartment, offer):
     """Function for getting the historical for an apartment filtered by offer run.
+
+    Args:
+        apartment: either string or int representing an apartment by name or id respectively.
+        offer: id representing the offer run from which to get apartment quotes.
 
     Returns:
         pandas.DataFrame: data frame object representing the apartment timeseries.
@@ -424,7 +463,12 @@ def get_apartment_history(apt_name, offer):
         sql = """SELECT * from state 
                         WHERE nidApartment = %s 
                         AND nidOffer = %s"""
-        df = sqlio.read_sql_query(sql, conn, params=(get_apartment_id(apt_name), offer))
+
+        apt_id = apartment
+        if isinstance(apartment, str):
+            apt_id = get_apartment_id(apartment)
+
+        df = sqlio.read_sql_query(sql, conn, params=(apt_id, offer))
         return df
 
     except Exception as e:
@@ -499,21 +543,115 @@ def get_current_state():
         DatabaseException(str(e))
 
 
-# if __name__ == '__main__':
-#     connect()
-#
-#     # apt_name = 'Körsbärsvägen 4 C / 1110'
-#     # apt_type = 'Enkelrum, (rum i korridor)'
-#     # apt_zone = 'Forum'
-#     # apt_price = 3799
-#     #
-#     # set_apartment(apt_name, apt_type, apt_zone, apt_price)
-#     # print(get_apartment_id(apt_name))
-#     # offer = set_offer(get_timestamp(), '2019-03-31 22:40:01')
-#     # offer = get_offer_id('2019-03-21 12:17:04')
-#     # print(offer)
-#
-#     r = get_current_offer_size()
-#     print(r)
-#
-#     disconnect()
+def get_all_top_credits(offer_id, apt_list):
+    global conn, log
+
+    apartments_sql = tuple(apt_list)
+
+    try:
+        log.info('Apartment State (get): Querying top credits')
+        sql = """SELECT apartment.name, time_stamp, top_credits
+                    FROM state JOIN apartment 
+                      ON state.nidapartment = apartment.nidapartment
+                    WHERE nidoffer = %s 
+                    AND state.nidapartment in %s"""
+
+        df = pd.read_sql_query(sql,
+                               con=conn,
+                               index_col='time_stamp',
+                               parse_dates='time_stamp',
+                               params=(offer_id, apartments_sql))
+
+        return df.pivot(columns='name', values='top_credits')
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Apartment State (get): Rolling back transaction')
+        log.exception("Apartment State (get): Couldn't get data")
+        raise DatabaseException()
+
+
+def get_all_no_applicants(offer_id, apt_list):
+    global conn, log
+
+    apartments_sql = tuple(apt_list)
+
+    try:
+        log.info('Apartment State (get): Querying number of applicants')
+        sql = """SELECT apartment.name, time_stamp, no_applicants
+                    FROM state JOIN apartment 
+                      ON state.nidapartment = apartment.nidapartment
+                    WHERE nidoffer = %s 
+                    AND state.nidapartment in %s"""
+
+        df = pd.read_sql_query(sql,
+                               con=conn,
+                               index_col='time_stamp',
+                               parse_dates='time_stamp',
+                               params=(offer_id, apartments_sql))
+
+        return df.pivot(columns='name', values='no_applicants')
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Apartment State (get): Rolling back transaction')
+        log.exception("Apartment State (get): Couldn't get data")
+        raise DatabaseException()
+
+
+def get_apartment_ids(apt_list):
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('Apartment (get): Querying for apartments ids')
+        sql = """SELECT nIdapartment 
+                      FROM apartment
+                      WHERE name IN %s"""
+        cur.execute(sql, (tuple(apt_list),))
+        res = cur.fetchall()
+        log.info('Apartment (get): Committing transaction')
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return [r[0] for r in res]
+        else:
+            conn.rollback()
+            log.error('Apartment (get): Rolling back transaction')
+            log.exception("Apartment (get): No matching records found")
+            print("No matching record found")
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Apartment (get): Rolling back transaction')
+        log.exception("Apartment (get): Couldn't retrieve apartments ids")
+        DatabaseException(str(e))
+
+
+def get_offered_apartments(offer_id):
+    global conn, log
+
+    cur = conn.cursor()
+    try:
+        log.info('Is Offered (get): Querying for apartments ids')
+        sql = """SELECT nIdapartment 
+                          FROM isoffered
+                          WHERE nidoffer = %s"""
+        cur.execute(sql, (offer_id,))
+        res = cur.fetchall()
+        log.info('Is Offered (get): Committing transaction')
+        conn.commit()
+        cur.close()
+        if res is not None:
+            return [r[0] for r in res]
+        else:
+            conn.rollback()
+            log.error('Is Offered (get): Rolling back transaction')
+            log.exception("Is Offered (get): No matching records found")
+            print("No matching records found")
+
+    except Exception as e:
+        conn.rollback()
+        log.error('Is Offered (get): Rolling back transaction')
+        log.exception("Is Offered (get): Couldn't retrieve apartments ids")
+        DatabaseException(str(e))

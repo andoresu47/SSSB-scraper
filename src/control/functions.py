@@ -9,6 +9,7 @@ import json
 import requests
 import os
 from dotenv import load_dotenv
+from matplotlib import pyplot as plt
 
 
 def get_timestamp():
@@ -36,6 +37,30 @@ def get_last_offer_timestamps():
     try:
         start_date, end_date = db_connection.get_current_offer_dates()
         return start_date, end_date
+
+    except DatabaseException as e:
+        print(str(e))
+
+    finally:
+        if not db_conn_status:
+            db_connection.disconnect()
+
+
+def get_last_offer_id():
+    """Function to get the id of the current offer.
+
+    Returns:
+        int = id of the desired offer.
+    """
+
+    db_conn_status = db_connection.is_connected()
+
+    if not db_conn_status:
+        db_connection.connect()
+
+    try:
+        offer_id = db_connection.get_current_offer_id()
+        return offer_id
 
     except DatabaseException as e:
         print(str(e))
@@ -141,6 +166,131 @@ def get_db_offering_size():
     finally:
         if not db_conn_status:
             db_connection.disconnect()
+
+
+def get_offered_apartments(offer_id):
+    """ Function to get a list of apartment ids for a given offer.
+
+    Args:
+        offer_id: id of desired apartment offering.
+
+    Returns:
+        list: list containing the ids of the desired apartments.
+    """
+
+    db_conn_status = db_connection.is_connected()
+
+    if not db_conn_status:
+        db_connection.connect()
+
+    try:
+        apt_list = db_connection.get_offered_apartments(offer_id)
+        return apt_list
+
+    except DatabaseException as e:
+        print(str(e))
+
+    finally:
+        if not db_conn_status:
+            db_connection.disconnect()
+
+
+def get_top_credits_hist(offer_id, apartment_list):
+    """Function to get the time series of the top credits for the specified offer and apartments.
+
+    Args:
+        offer_id: id of desired apartment offering.
+        apartment_list: list of apartment ids whose info we want to retrieve.
+
+    Returns:
+        pandas.DataFrame: data frame containing the "top_credits" times series for each apartment.
+    """
+
+    db_conn_status = db_connection.is_connected()
+
+    if not db_conn_status:
+        db_connection.connect()
+
+    try:
+        df = db_connection.get_all_top_credits(offer_id, apartment_list)
+        return df
+
+    except DatabaseException as e:
+        print(str(e))
+
+    finally:
+        if not db_conn_status:
+            db_connection.disconnect()
+
+
+def get_applicants_hist(offer_id, apartment_list):
+    """Function to get the time series of the number of applicants for the specified offer and apartments.
+
+    Args:
+        offer_id: id of desired apartment offering.
+        apartment_list: list of apartment ids whose info we want to retrieve.
+
+    Returns:
+        pandas.DataFrame: data frame containing the "no_applicants" times series for each apartment.
+    """
+
+    db_conn_status = db_connection.is_connected()
+
+    if not db_conn_status:
+        db_connection.connect()
+
+    try:
+        df = db_connection.get_all_no_applicants(offer_id, apartment_list)
+        return df
+
+    except DatabaseException as e:
+        print(str(e))
+
+    finally:
+        if not db_conn_status:
+            db_connection.disconnect()
+
+
+def plot_time_series(series, data=None):
+    """ Function to generate a plot of the top credits or number of applicants time series.
+
+    Args:
+        series: boolean representing the nature of the data (True for "credits" and False for "applicants").
+        data: id of desired apartment offering.
+
+    Returns:
+        pandas.DataFrame: data frame containing the specified times series for each apartment.
+    """
+    light_gray = (225 / 255., 225 / 255., 225 / 255.)
+    lightest_gray = (250 / 255., 250 / 255., 250 / 255.)
+
+    f = plt.figure(figsize=(12, 6))
+
+    if series:
+        plt.title('Top credits', fontsize=18)
+        filename = "topCredits.png"
+    else:
+        plt.title('Number of applicants', fontsize=18)
+        filename = "numberOfApplicants.png"
+
+    if data is None:
+        last_offer_id = get_last_offer_id()
+        apts = get_offered_apartments(last_offer_id)
+
+        if series:
+            data = get_top_credits_hist(last_offer_id, apts)
+        else:
+            data = get_applicants_hist(last_offer_id, apts)
+
+    data = data.fillna(method='ffill')
+    data.plot(ax=f.gca())
+    plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+    plt.grid(b=True, color=light_gray, linestyle='-')
+    ax = plt.gca()
+    ax.set_facecolor(lightest_gray)
+    f.savefig(filename)
+
+    return f
 
 
 def send_slack_notification(*args):
