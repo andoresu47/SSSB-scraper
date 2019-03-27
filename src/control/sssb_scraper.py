@@ -11,8 +11,8 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
-from item_loaders import SSSBApartmentLoader, SSSBApartmentStateLoader
-from items import SSSBApartmentItem, SSSBApartmentStateItem
+from src.control.item_loaders import SSSBApartmentLoader, SSSBApartmentStateLoader
+from src.control.items import SSSBApartmentItem, SSSBApartmentStateItem
 
 
 def get_timestamp():
