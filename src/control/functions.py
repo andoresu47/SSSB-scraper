@@ -279,12 +279,13 @@ def get_offered_apartments_by_type(offer_id, type):
             db_connection.disconnect()
 
 
-def plot_time_series(series, data=None):
+def plot_time_series(series, data=None, own_credits=None):
     """ Function to generate a plot of the top credits or number of applicants time series.
 
     Args:
         series: boolean representing the nature of the data (True for "credits" and False for "applicants").
         data: id of desired apartment offering.
+        own_credits: current credit days.
 
     Returns:
         pandas.DataFrame: data frame containing the specified times series for each apartment.
@@ -312,11 +313,16 @@ def plot_time_series(series, data=None):
 
     data = data.fillna(method='ffill')
     data.plot(ax=f.gca())
-    plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+    lgd = plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
     plt.grid(b=True, color=light_gray, linestyle='-')
+
     ax = plt.gca()
     ax.set_facecolor(lightest_gray)
-    f.savefig(filename)
+
+    if series and own_credits is not None:
+        plt.axhline(own_credits, color='k', linestyle='--')
+
+    f.savefig(filename, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
     return f
 
