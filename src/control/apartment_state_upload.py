@@ -24,4 +24,4 @@ if __name__ == '__main__':
         fn.send_slack_notification("Apartment state upload", 1)
 
     except Exception as e:
-        fn.send_slack_notification("Apartment offer upload", 0, str(e))
+        fn.send_slack_notification("Apartment state upload", 0, str(e))

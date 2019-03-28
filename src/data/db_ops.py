@@ -424,9 +424,7 @@ def get_current_offer_size():
     cur = conn.cursor()
     try:
         log.info('IsOffered (get): Querying for last offer size')
-        sql = """SELECT count(*) from isoffered 
-                    GROUP BY nidoffer 
-                    HAVING nidoffer = max(nidoffer)"""
+        sql = """select count(*) as x from isoffered group by nidoffer order by x desc limit 1"""
         cur.execute(sql)
         res = cur.fetchall()
         log.info('IsOffered (get): Committing transaction')
