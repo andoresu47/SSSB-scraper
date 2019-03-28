@@ -22,6 +22,21 @@ def get_timestamp():
     return time.strftime('%Y-%m-%d %H:%M:%S')
 
 
+def compute_time_difference(tstamp1, tstamp2):
+    """Function to compute the difference between two time stamps in minutes.
+
+    Args:
+        tstamp1: first timestamp.
+        tstamp2: second timestamp.
+
+    Returns:
+        int: integer representing the time difference in minutes.
+    """
+
+    td = tstamp1 - tstamp2
+    return int(round(td.total_seconds() / 60))
+
+
 def get_last_offer_timestamps():
     """Function to get the start and end timestamps of the current offer.
 

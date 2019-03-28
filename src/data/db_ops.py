@@ -13,7 +13,6 @@ import pandas as pd
 import pandas.io.sql as sqlio
 from dotenv import load_dotenv
 import time
-from matplotlib import pyplot as plt
 
 # Initialization of global db connection and logging config.
 
