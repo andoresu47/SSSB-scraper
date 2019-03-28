@@ -10,6 +10,7 @@ import requests
 import os
 from dotenv import load_dotenv
 from matplotlib import pyplot as plt
+from slackclient import SlackClient
 
 
 def get_timestamp():
@@ -342,6 +343,42 @@ def plot_time_series(series, data=None, own_credits=None):
     return f
 
 
+def gen_plots_kitchenette(offer_id, own_credits):
+    knt = get_offered_apartments_by_type(offer_id, 'Ett rum med pentry')
+
+    df1 = get_top_credits_hist(offer_id, knt)
+    df2 = get_applicants_hist(offer_id, knt)
+    data1 = df1.fillna(method='ffill')
+    data2 = df2.fillna(method='ffill')
+
+    f = plot_time_series(True, data1, own_credits)
+    g = plot_time_series(False, data2, own_credits)
+
+    return f, g
+
+
+def post_slack_image(filepath, title):
+    """Function in charge of posting notifications to Slack's channel "sssb",
+    in the form of apartment data plots.
+
+    """
+
+    dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+    load_dotenv(dotenv_path)
+    slack_token = os.getenv("SLACK_API_TOKEN")
+
+    sc = SlackClient(slack_token)
+
+    with open(filepath, 'rb') as file_content:
+        sc.api_call(
+            "files.upload",
+            channels="#sssb_sketch",
+            file=file_content,
+            title=title,
+            username='SlackBot',
+        )
+
+
 def send_slack_notification(*args):
     """Function in charge of posting notifications to Slack,
         informing about insertion tasks, or custom messages.
@@ -414,3 +451,7 @@ def send_slack_notification(*args):
             'Request to slack returned an error %s, the response is:\n%s'
             % (response.status_code, response.text)
         )
+
+
+if __name__ == '__main__':
+    post_slack_image('topCredits.png')
