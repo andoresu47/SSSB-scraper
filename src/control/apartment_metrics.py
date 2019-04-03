@@ -10,10 +10,10 @@ def single_rooms(credits):
     offer_id = fn.get_last_offer_id()
     fn.gen_plots_single_room(offer_id, credits)
 
-    filepath1 = os.path.join(os.path.dirname(__file__), "topCredits.png")
+    filepath1 = os.path.join(os.path.dirname(__file__), "topCredits_SR.png")
     title1 = "Single Rooms: Top credits"
 
-    filepath2 = os.path.join(os.path.dirname(__file__), "numberOfApplicants.png")
+    filepath2 = os.path.join(os.path.dirname(__file__), "numberOfApplicants_SR.png")
     title2 = "Single Rooms: Number of applicants"
 
     fn.post_slack_image(filepath1, title1)
@@ -24,10 +24,10 @@ def kitchenette(credits):
     offer_id = fn.get_last_offer_id()
     fn.gen_plots_kitchenette(offer_id, credits)
 
-    filepath1 = os.path.join(os.path.dirname(__file__), "topCredits.png")
+    filepath1 = os.path.join(os.path.dirname(__file__), "topCredits_KN.png")
     title1 = "Rooms with kitchenette: Top credits"
 
-    filepath2 = os.path.join(os.path.dirname(__file__), "numberOfApplicants.png")
+    filepath2 = os.path.join(os.path.dirname(__file__), "numberOfApplicants_KN.png")
     title2 = "Rooms with kitchenette: Number of applicants"
 
     fn.post_slack_image(filepath1, title1)
