@@ -357,6 +357,20 @@ def gen_plots_kitchenette(offer_id, own_credits):
     return f, g
 
 
+def gen_plots_single_room(offer_id, own_credits):
+    knt = get_offered_apartments_by_type(offer_id, 'Enkelrum, (rum i korridor)')
+
+    df1 = get_top_credits_hist(offer_id, knt)
+    df2 = get_applicants_hist(offer_id, knt)
+    data1 = df1.fillna(method='ffill')
+    data2 = df2.fillna(method='ffill')
+
+    f = plot_time_series(True, data1, own_credits)
+    g = plot_time_series(False, data2, own_credits)
+
+    return f, g
+
+
 def post_slack_image(filepath, title):
     """Function in charge of posting notifications to Slack's channel "sssb",
     in the form of apartment data plots.
