@@ -32,7 +32,7 @@ class SSSBApartmentInfoSpider(scrapy.Spider):
     """
 
     name = "sssb_apt_spider"
-    start_urls = ['https://www.sssb.se/widgets/?paginationantal=all&callback=jQuery17208255315905375711_1549963009511'
+    start_urls = ['https://www.sssb.se/widgets/?paginationantal=100&callback=jQuery17208255315905375711_1549963009511'
                   '&widgets%5B%5D=alert&widgets%5B%5D=objektsummering%40lagenheter&widgets%5B%5D=objektfilter'
                   '%40lagenheter&widgets%5B%5D=objektsortering%40lagenheter&widgets%5B%5D=objektlistabilder'
                   '%40lagenheter&widgets%5B%5D=paginering%40lagenheter&widgets%5B%5D=pagineringantal%40lagenheter'
@@ -74,7 +74,7 @@ class SSSBApartmentStateSpider(scrapy.Spider):
     """
 
     name = "sssb_st_spider"
-    start_urls = ['https://www.sssb.se/widgets/?paginationantal=all&callback=jQuery17208255315905375711_1549963009511'
+    start_urls = ['https://www.sssb.se/widgets/?paginationantal=100&callback=jQuery17208255315905375711_1549963009511'
                   '&widgets%5B%5D=alert&widgets%5B%5D=objektsummering%40lagenheter&widgets%5B%5D=objektfilter'
                   '%40lagenheter&widgets%5B%5D=objektsortering%40lagenheter&widgets%5B%5D=objektlistabilder'
                   '%40lagenheter&widgets%5B%5D=paginering%40lagenheter&widgets%5B%5D=pagineringantal%40lagenheter'

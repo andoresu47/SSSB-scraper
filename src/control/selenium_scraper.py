@@ -18,7 +18,7 @@ from datetime import datetime
 
 SSSB_FRONTPAGE = 'https://www.sssb.se/en'
 SSSB_AVAILABLE_APARTMENTS = 'https://www.sssb.se/en/find-apartment/apply-for-apartment/available-apartments' \
-                            '/?paginationantal=all '
+                            '/?pagination=0&paginationantal=100 '
 
 
 class ApartmentException(Exception):
